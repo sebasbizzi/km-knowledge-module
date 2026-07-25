@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/
+
+# Datos descargados (PDFs) — binarios, no se versionan. Ubicación configurable via
+# KM_DOCUMENT_STORE_DIR; este es el default cuando no se setea.
+document_store_data/

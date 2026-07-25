@@ -1,0 +1,45 @@
+# Plantilla del área de lecciones — Capa 1 (transversal a todos los agentes e instancias)
+# Los agentes escriben y leen lecciones vía knowledge_module.aprendizaje (nunca directamente).
+#
+# SIN tenant a propósito (cerrando el pendiente AUDIT-P11 que anotaba el encabezado anterior):
+# la plantilla es genérica y viene DENTRO del paquete; el tenant lo aporta cada instancia al
+# cargarla — aprendizaje.ensure_area(tenant=...) → load_plantilla(path, tenant=...).
+# Antes tenía un tenant hardcodeado: cualquier instancia que cargara sus lecciones las habría
+# creado bajo el tenant equivocado sin aviso.
+
+area: lecciones
+objetivo: >
+  Repositorio transversal de aprendizajes del sistema. Dos tipos: lecciones de caso
+  (dominio, escritas por el agente al terminar) y lecciones de proceso (método, escritas
+  por el humano al cerrar la corrida). Los agentes las leen antes de actuar.
+descripcion: Loop de aprendizaje — leccion_caso (dominio/análogo) + leccion_proceso (método/siempre).
+
+tipos_ficha:
+  - nombre: leccion_caso
+    descripcion: >
+      Conocimiento de dominio aprendido en una corrida. Escrita por el agente automáticamente.
+      Se recupera por búsqueda semántica cuando el contexto es análogo al caso actual.
+    campos:
+      - contenido       # La lección en sí — vectorizado
+      - agente          # nombre del agente que la escribió
+      - contexto        # Palabras clave del caso
+      - tipo_observacion # "error_a_evitar" / "acierto_a_repetir" / "patron"
+      - oportunidad_id  # UUID de la oportunidad en el KM (opcional, campo en props v1)
+      - fuente          # "agente_auto" / "humano"
+    vectorizar: contenido
+    dedup_por: null
+
+  - nombre: leccion_proceso
+    descripcion: >
+      Observación sobre el MÉTODO del agente. Escrita por el humano al cierre de cada corrida.
+      Se lee SIEMPRE, en TODAS las corridas futuras del agente — sin excepción.
+      Captura cómo mejorar el proceso, no el conocimiento de dominio.
+    campos:
+      - contenido       # La observación — vectorizado
+      - agente          # Agente al que aplica (nombre de agente, o "todos")
+      - tipo_observacion # "mejora_proceso" / "antipatron" / "regla"
+      - fuente          # "humano" (default) / "agente_auto"
+    vectorizar: contenido
+    dedup_por: null
+
+tipos_conexion: []
